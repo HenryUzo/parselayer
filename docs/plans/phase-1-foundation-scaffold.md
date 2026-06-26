@@ -2,7 +2,7 @@
 
 ## Understanding
 
-The approved Phase 0 architecture exists, but no executable workspace, CI pipeline, local infrastructure, typed configuration, application shell, worker, or database schema exists.
+The approved Phase 0 architecture existed without an executable workspace, CI pipeline, local infrastructure, typed configuration, application shell, worker, or database schema.
 
 ## Scope
 
@@ -13,7 +13,7 @@ This plan creates the minimum coherent engineering foundation for later authenti
 - pnpm and Turborepo manage the workspace.
 - TypeScript strict mode applies across all workspaces.
 - Next.js web, NestJS/Fastify API, and NestJS worker build independently.
-- PostgreSQL, Redis, and private S3-compatible local storage start through Docker Compose.
+- PostgreSQL, Redis, and private S3-compatible local storage are configured through Docker Compose.
 - Environment variables are typed and validated without exposing values in errors.
 - Prisma models establish users, organisations, memberships, projects, and test/live environments.
 - CI runs formatting, linting, type checking, unit tests, integration-test placeholders, migration deployment, and production builds.
@@ -34,11 +34,11 @@ Adds only metadata and health/readiness endpoints. Public document endpoints are
 
 ## Security and privacy impact
 
-Adds secret-safe environment validation, log redaction, isolated local service credentials, private object-storage setup, and CI secret discipline. No personal documents or external provider credentials are included.
+Adds secret-safe environment validation, log redaction, isolated local service credentials, private object-storage setup, an explicit native dependency build-script allow-list, frozen dependency resolution, and read-only CI permissions. No personal documents or external provider credentials are included.
 
 ## Test strategy
 
-Run formatting, linting, strict type checking, unit tests, Prisma generation, migration validation, and production builds. Docker-dependent runtime checks remain manual where Docker is unavailable.
+Run formatting, linting, strict type checking, unit tests, Prisma generation, schema validation, PostgreSQL migration deployment, integration-test commands, and production builds. External providers remain excluded from ordinary CI.
 
 ## Rollback
 
@@ -46,27 +46,39 @@ The scaffold is isolated on a feature branch. It can be reverted without data mi
 
 ## Verification results
 
-Executed locally on 26 June 2026:
+Completed on 26 June 2026.
 
-- Dependency installation and lockfile generation: passed through the controlled package mirror.
-- Supply-chain build-script allow-list: configured for Prisma engines, Prisma, esbuild, Sharp, and msgpackr extraction.
-- `pnpm format:check`: passed.
-- `pnpm lint`: passed for all six workspaces.
-- `pnpm typecheck`: passed for all six workspaces.
-- `pnpm test`: passed; five tests across configuration, API health, and worker runtime.
-- `pnpm test:integration`: command passed with no integration fixtures yet.
-- Prisma client generation: passed.
-- Prisma schema validation: passed.
-- Individual production builds for config, domain, database, API, worker, and web: passed.
-- Next.js production route generation: passed for `/`, `/_not-found`, and `/api/health`.
+Local verification:
 
-Not executed locally:
+- Dependency installation and lockfile generation passed through the controlled package mirror.
+- The native build-script allow-list covers Prisma engines, Prisma, esbuild, Sharp, and msgpackr extraction.
+- Formatting passed.
+- Linting passed for all six workspaces.
+- Strict type checking passed for all six workspaces.
+- Five unit tests passed across configuration, API health, and worker runtime.
+- The integration-test command passed with no integration fixtures yet.
+- Prisma client generation and schema validation passed.
+- Production builds passed for config, domain, database, API, worker, and web.
+- Web runtime checks passed for `/` and `/api/health`.
+- API runtime checks passed for `/v1`, `/health`, and `/ready`.
 
-- Docker Compose service startup and migration deployment, because Docker and PostgreSQL clients are unavailable in the execution environment.
-- Real queue, object-storage, authentication, OCR, and AI provider tests, because those capabilities are deliberately outside this scaffold.
+GitHub Actions verification:
 
-GitHub Actions created workflow runs but failed before exposing executable step logs. The pull request remains a draft until repository Actions execution is available or an equivalent independent CI run passes.
+- GitHub-hosted runner allocation passed after the account billing lock was resolved.
+- Frozen lockfile installation passed.
+- Repository formatting passed.
+- Prisma client generation and schema validation passed.
+- The initial migration deployed successfully to a PostgreSQL 16 service container.
+- Linting and strict type checking passed.
+- Unit tests and the integration-test command passed.
+- The complete production build passed.
+
+Not included in this phase:
+
+- End-to-end startup of the complete local Docker Compose stack with Redis and MinIO.
+- Real queue, object-storage, authentication, OCR, AI, and billing provider tests.
+- Tenant-isolation tests, which require the application authorization and persistence services introduced in the next foundation increment.
 
 ## Review
 
-The scaffold now has strict package boundaries, explicit native dependency approval, a locally generated lockfile, a tenant-aware initial schema, secret-safe configuration validation, private local object-storage defaults, and independently buildable deployment units. The lockfile still needs to be committed before the pull request can leave draft status. No product feature is represented as complete.
+The scaffold now has strict package boundaries, explicit native dependency approval, a committed lockfile, tenant-aware database foundations, secret-safe configuration validation, private local object-storage defaults, independently buildable deployment units, and a green PostgreSQL-backed CI pipeline. No product feature is represented as complete.
