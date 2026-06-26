@@ -42,7 +42,7 @@ export interface LocalHeaderAccessContext {
   environmentId?: string;
 }
 
-const rolePermissions = {
+const rolePermissions: Record<LocalMembershipRole, readonly LocalPermission[]> = {
   OWNER: [
     'organisation:read',
     'organisation:update',
@@ -98,7 +98,7 @@ const rolePermissions = {
     'review:read',
     'review:write',
   ],
-} satisfies Record<LocalMembershipRole, readonly LocalPermission[]>;
+};
 
 export function resolveLocalHeaderAccessContext(
   headers: HeaderBag,

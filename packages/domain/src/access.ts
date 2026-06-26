@@ -24,7 +24,7 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
-const rolePermissions = {
+const rolePermissions: Record<MembershipRole, readonly Permission[]> = {
   OWNER: PERMISSIONS,
   ADMIN: [
     'organisation:read',
@@ -62,7 +62,7 @@ const rolePermissions = {
     'review:read',
     'review:write',
   ],
-} satisfies Record<MembershipRole, readonly Permission[]>;
+};
 
 export class AccessDeniedError extends Error {
   constructor(message = 'Access denied') {
