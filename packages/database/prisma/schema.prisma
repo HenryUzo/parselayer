@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
 }
 
 datasource db {
@@ -34,14 +35,14 @@ model User {
 }
 
 model Organisation {
-  id           String   @id @default(cuid())
-  name         String
-  slug         String   @unique
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   memberships OrganisationMembership[]
-  projects     Project[]
+  projects    Project[]
   environments Environment[]
 
   @@map("organisations")

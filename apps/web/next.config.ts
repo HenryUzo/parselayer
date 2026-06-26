@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   transpilePackages: ['@parselayer/config'],
-  experimental: { typedRoutes: true },
+  typedRoutes: true,
 };
 
 export default nextConfig;

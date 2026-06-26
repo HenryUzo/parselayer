@@ -19,12 +19,6 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "useDefineForClassFields": false,
-    "baseUrl": ".",
-    "paths": {
-      "@parselayer/config": ["packages/config/src/index.ts"],
-      "@parselayer/database": ["packages/database/src/index.ts"],
-      "@parselayer/domain": ["packages/domain/src/index.ts"]
-    }
+    "useDefineForClassFields": false
   }
 }

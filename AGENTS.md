@@ -6,7 +6,7 @@ ParseLayer is a production-grade, multi-tenant AI document intelligence platform
 
 ## Repository status
 
-The project is in Phase 0. Do not implement production features until the architecture, data model, API conventions, security baseline, and first execution plan are approved.
+The project is in Phase 1. The architecture baseline is approved. Implement the foundation in independently reviewable increments; document ingestion, parsing, OCR, AI extraction, billing, and production authentication remain outside the current scaffold scope.
 
 ## Intended repository structure
 
@@ -24,7 +24,7 @@ The project is in Phase 0. Do not implement production features until the archit
 
 Do not add a package unless it has a clear owner, boundary, and consumer.
 
-## Planned technology stack
+## Current technology foundation
 
 - TypeScript in strict mode
 - pnpm workspaces and Turborepo
@@ -41,7 +41,7 @@ Architecture decisions in `docs/decisions/` override provisional stack statement
 
 ## Required commands
 
-The final scripts must expose these root commands once the workspace is scaffolded:
+The workspace exposes these root commands:
 
 - `pnpm dev`
 - `pnpm build`
@@ -53,11 +53,12 @@ The final scripts must expose these root commands once the workspace is scaffold
 - `pnpm test:evaluation`
 - `pnpm format:check`
 - `pnpm db:generate`
+- `pnpm db:validate`
 - `pnpm db:migrate`
 - `pnpm db:migrate:deploy`
 - `pnpm db:seed`
 
-Do not document a command that is not implemented and verified.
+Do not present an unverified command as passing. Infrastructure-dependent verification must be recorded in the active execution plan.
 
 ## Coding rules
 

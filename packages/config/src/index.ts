@@ -31,6 +31,7 @@ const apiEnvironmentSchema = baseEnvironmentSchema.extend({
 });
 
 const workerEnvironmentSchema = baseEnvironmentSchema.merge(dataServicesSchema);
+
 const webEnvironmentSchema = z.object({
   NEXT_PUBLIC_API_BASE_URL: z.url().default('http://localhost:3001'),
 });
@@ -52,6 +53,7 @@ export class EnvironmentValidationError extends Error {
 
 function parseEnvironment<T>(schema: z.ZodType<T>, input: NodeJS.ProcessEnv): T {
   const result = schema.safeParse(input);
+
   if (!result.success) {
     throw new EnvironmentValidationError(
       result.error.issues.map((issue) => ({
@@ -60,6 +62,7 @@ function parseEnvironment<T>(schema: z.ZodType<T>, input: NodeJS.ProcessEnv): T 
       })),
     );
   }
+
   return result.data;
 }
 
@@ -75,6 +78,8 @@ export function loadWebEnvironment(input: NodeJS.ProcessEnv = process.env): WebE
   return parseEnvironment(webEnvironmentSchema, input);
 }
 
-export function loadDataServicesEnvironment(input: NodeJS.ProcessEnv = process.env): DataServicesEnvironment {
+export function loadDataServicesEnvironment(
+  input: NodeJS.ProcessEnv = process.env,
+): DataServicesEnvironment {
   return parseEnvironment(dataServicesSchema, input);
 }
