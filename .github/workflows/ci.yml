@@ -26,8 +26,10 @@ jobs:
         with:
           node-version: 22
 
-      - name: Refresh lockfile
-        run: pnpm install --no-frozen-lockfile
+      - name: Rebuild lockfile
+        run: |
+          pnpm clean --lockfile
+          pnpm install --no-frozen-lockfile
 
       - name: Commit refreshed lockfile
         run: |
