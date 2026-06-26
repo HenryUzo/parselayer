@@ -28,11 +28,11 @@ jobs:
       OBJECT_STORAGE_BUCKET: parselayer-test
       OBJECT_STORAGE_ACCESS_KEY: test
       OBJECT_STORAGE_SECRET_KEY: test-value
-      OBJECT_STORAGE_FORCE_PATH_STYLE: 'true'
+      OBJECT_STORAGE_FORCE_PATH_STYLE: "true"
       WEB_ORIGIN: http://localhost:3000
       NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
-      NEXT_TELEMETRY_DISABLED: '1'
-      TURBO_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: "1"
+      TURBO_TELEMETRY_DISABLED: "1"
 
     services:
       postgres:
@@ -71,7 +71,7 @@ jobs:
       - name: Commit generated lockfile
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          if ! git diff --quiet -- pnpm-lock.yaml; then
+          if [ -n "$(git status --porcelain -- pnpm-lock.yaml)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add pnpm-lock.yaml
