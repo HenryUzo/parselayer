@@ -2,7 +2,7 @@
 
 ## Understanding
 
-The Phase 1 scaffold is merged. The repository has deployable web, API, worker, database, and CI foundations, but it still lacks enforceable access rules. The next increment must establish authentication context contracts, organisation membership policy, tenant-bound resources, API-key primitives, and database records before document ingestion begins.
+The Phase 1 scaffold is merged. The repository has deployable web, API, worker, database, and CI foundations, but it still lacks enforceable access rules. The next increment establishes authentication context contracts, organisation membership policy, tenant-bound resources, API-key primitives, and database records before document ingestion begins.
 
 ## Scope
 
@@ -65,8 +65,28 @@ The migration is additive. Before production data exists, rollback can remove `a
 
 ## Verification results
 
-Pending CI.
+Completed on 26 June 2026.
+
+GitHub Actions run `28271464441` passed:
+
+- Frozen lockfile installation passed.
+- Repository formatting passed.
+- Prisma client generation passed.
+- Prisma schema validation passed.
+- The additive access migration deployed successfully to PostgreSQL 16.
+- Linting passed across all workspaces.
+- Strict TypeScript checking passed across all workspaces.
+- Unit tests passed, including domain access policy, API-key primitives, and local/test access context resolution.
+- Integration-test command passed.
+- Production builds passed for all deployable units and shared packages.
+
+Not included in this phase:
+
+- Clerk or production session verification.
+- Customer-facing API-key management endpoints.
+- Tenant-isolation persistence tests tied to application repositories/services.
+- Real document, OCR, AI, storage, or billing provider tests.
 
 ## Review
 
-Pending implementation and CI verification.
+The access-control foundation is now implemented as a safe intermediate layer. It introduces shared role and scope policy, one-way API-key hashing, tenant-scoped API-key records, audit-log structure, and local/test-only request context resolution without representing production authentication as complete.
