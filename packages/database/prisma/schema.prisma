@@ -1,0 +1,98 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+  REVIEWER
+}
+
+enum EnvironmentType {
+  TEST
+  LIVE
+}
+
+model User {
+  id             String   @id @default(cuid())
+  externalAuthId String   @unique @map("external_auth_id")
+  email          String
+  displayName    String?  @map("display_name")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  memberships OrganisationMembership[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Organisation {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memberships OrganisationMembership[]
+  projects    Project[]
+  environments Environment[]
+
+  @@map("organisations")
+}
+
+model OrganisationMembership {
+  id             String         @id @default(cuid())
+  organisationId String         @map("organisation_id")
+  userId         String         @map("user_id")
+  role           MembershipRole
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organisationId, userId])
+  @@index([userId])
+  @@map("organisation_memberships")
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  organisationId String   @map("organisation_id")
+  name           String
+  slug           String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  environments Environment[]
+
+  @@unique([organisationId, slug])
+  @@index([organisationId])
+  @@map("projects")
+}
+
+model Environment {
+  id             String          @id @default(cuid())
+  organisationId String          @map("organisation_id")
+  projectId      String          @map("project_id")
+  type           EnvironmentType
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, type])
+  @@index([organisationId])
+  @@index([organisationId, projectId])
+  @@map("environments")
+}

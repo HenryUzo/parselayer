@@ -1,0 +1,40 @@
+{
+  "name": "parselayer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
+    "test:evaluation": "turbo run test:evaluation",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @parselayer/database db:generate",
+    "db:validate": "pnpm --filter @parselayer/database db:validate",
+    "db:migrate": "pnpm --filter @parselayer/database db:migrate",
+    "db:migrate:deploy": "pnpm --filter @parselayer/database db:migrate:deploy",
+    "db:seed": "pnpm --filter @parselayer/database db:seed",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:reset": "docker compose down -v"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.0.1",
+    "eslint": "10.5.0",
+    "globals": "17.7.0",
+    "prettier": "3.8.4",
+    "turbo": "2.10.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.62.0"
+  }
+}

@@ -11,46 +11,77 @@ ParseLayer is a production-grade, multi-tenant AI document intelligence platform
 
 ## Project status
 
-Phase 0 — discovery, product definition, architecture, security planning, and execution planning.
+Phase 1 is active. The repository now contains the engineering foundation for the web application, API, worker process, PostgreSQL, Redis, local S3-compatible storage, typed environment configuration, CI, and the initial tenant data model.
 
-No production feature implementation should begin until the Phase 0 architecture and first execution plan have been reviewed.
+Document ingestion, AI extraction, OCR, external authentication, billing, and production queue processors are not implemented yet.
 
-## Planned architecture
+## Repository structure
 
-- TypeScript monorepo using pnpm workspaces and Turborepo
-- Next.js web application
-- NestJS API using Fastify
+- `apps/web` — Next.js product application
+- `apps/api` — NestJS API using Fastify
+- `apps/worker` — NestJS background-worker process
+- `packages/config` — typed and validated environment configuration
+- `packages/database` — Prisma schema, migrations, generated client, and database factory
+- `packages/domain` — provider-independent domain constants and types
+- `infra/local` — local infrastructure initialization
+- `docs` — product, architecture, security, execution, and operating documentation
+
+## Technology foundation
+
+- pnpm workspaces and Turborepo
+- TypeScript strict mode
+- Next.js and React
+- NestJS with Fastify
 - PostgreSQL with Prisma
-- Redis and BullMQ for durable asynchronous processing
-- S3-compatible private object storage
-- OpenAPI-based public API
-- Separate background worker applications
-- Provider adapters for AI, OCR, storage, malware scanning, authentication, and billing
+- Redis and BullMQ
+- MinIO for local S3-compatible storage
+- GitHub Actions CI
+- Vitest and Playwright foundations
 
-The final architecture and technology decisions are recorded in `docs/` and `docs/decisions/`.
+Architecture decisions are recorded in `docs/decisions/`.
 
-## Repository documentation
+## Local development
 
-- `AGENTS.md` — enforceable repository working rules
-- `PLANS.md` — execution-plan format and active plans
-- `docs/product-requirements.md` — approved product scope and exclusions
-- `docs/system-architecture.md` — target system architecture
-- `docs/data-model.md` — initial multi-tenant data model
-- `docs/api-design.md` — versioned API conventions and initial endpoints
-- `docs/ai-extraction-strategy.md` — extraction, confidence, evidence, and review strategy
-- `docs/evaluation-framework.md` — quality measurement and regression gates
-- `docs/security-and-privacy.md` — threat model and security requirements
-- `docs/design-system.md` — interface and accessibility direction
-- `docs/deployment.md` — environments and deployment model
-- `docs/testing-strategy.md` — automated and manual verification strategy
-- `docs/observability.md` — logs, metrics, traces, dashboards, and alerts
-- `docs/roadmap.md` — phased delivery roadmap
+Prerequisites:
 
-## Current decisions
+- Node.js 22
+- pnpm 11.9.0
+- Docker with Docker Compose
 
-The following defaults are provisionally approved:
+Setup:
 
-- Deployment target: AWS, with optional Vercel hosting for the Next.js application
+```bash
+cp .env.example .env
+pnpm install
+pnpm infra:up
+pnpm db:generate
+pnpm db:migrate
+pnpm dev
+```
+
+Default endpoints:
+
+- Web: `http://localhost:3000`
+- API: `http://localhost:3001`
+- API health: `http://localhost:3001/health`
+- MinIO console: `http://localhost:9001`
+
+See `docs/getting-started.md` for full instructions.
+
+## Quality commands
+
+```bash
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:integration
+pnpm build
+```
+
+## Current provider decisions
+
+- Production deployment target: AWS, with optional Vercel hosting for the web application
 - Database: PostgreSQL
 - Object storage: AWS S3
 - Initial AI provider: OpenAI behind an internal provider interface

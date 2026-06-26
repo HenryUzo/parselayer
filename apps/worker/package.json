@@ -1,0 +1,30 @@
+{
+  "name": "@parselayer/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "lint": "eslint src test --max-warnings=0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run --passWithNoTests --dir test/integration",
+    "test:evaluation": "vitest run --passWithNoTests --dir test/evaluation"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@parselayer/config": "workspace:*",
+    "@parselayer/domain": "workspace:*",
+    "bullmq": "5.79.1",
+    "ioredis": "5.11.1",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "tsx": "4.22.4",
+    "vitest": "4.1.9"
+  }
+}
