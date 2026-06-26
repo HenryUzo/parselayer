@@ -138,9 +138,13 @@ function isLocalHeaderAuthEnvironment(value: string): value is LocalHeaderAuthEn
 }
 
 function firstHeader(value: string | readonly string[] | undefined): string | null {
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
+  if (typeof value === 'string') {
+    return value;
   }
 
-  return value ?? null;
+  if (!value) {
+    return null;
+  }
+
+  return value[0] ?? null;
 }
