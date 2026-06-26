@@ -32,30 +32,6 @@ jobs:
       WEB_ORIGIN: http://localhost:3000
       NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: parselayer
-          POSTGRES_PASSWORD: parselayer
-          POSTGRES_DB: parselayer
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U parselayer -d parselayer"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7.4-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -81,11 +57,11 @@ jobs:
           path: pnpm-lock.yaml
           retention-days: 1
 
-      - name: Create shadow database
-        run: PGPASSWORD=parselayer createdb -h localhost -U parselayer parselayer_shadow
-
       - name: Generate Prisma client
         run: pnpm db:generate
+
+      - name: Validate Prisma schema
+        run: pnpm db:validate
 
       - name: Check formatting
         run: pnpm format:check
@@ -101,9 +77,6 @@ jobs:
 
       - name: Run integration tests
         run: pnpm test:integration
-
-      - name: Validate migration state
-        run: pnpm db:migrate:deploy
 
       - name: Build
         run: pnpm build

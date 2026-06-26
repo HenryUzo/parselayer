@@ -12,6 +12,7 @@
     "test:integration": "vitest run --passWithNoTests --dir test/integration",
     "test:evaluation": "vitest run --passWithNoTests --dir test/evaluation",
     "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed"
