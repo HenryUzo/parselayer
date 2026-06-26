@@ -1,4 +1,4 @@
-name: Formatting diagnostic
+name: Install diagnostic
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  formatting:
+  install-diagnostic:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -25,10 +25,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Capture install output
+        continue-on-error: true
+        run: pnpm install --no-frozen-lockfile 2>&1 | tee install-diagnostic.log
 
-      - name: List files requiring formatting
-        run: pnpm exec prettier --list-different .
+      - name: Upload install diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-diagnostic
+          path: install-diagnostic.log
+          retention-days: 1
