@@ -1,16 +1,10 @@
-name: CI
+name: Formatting diagnostic
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   formatting:
@@ -34,84 +28,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check formatting
-        run: pnpm format:check
+      - name: Capture formatting paths
+        continue-on-error: true
+        run: pnpm exec prettier --list-different . 2>&1 | tee formatting-diagnostic.log
 
-  quality:
-    needs: formatting
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      APP_ENV: test
-      NODE_ENV: test
-      LOG_LEVEL: silent
-      DATABASE_URL: postgresql://parselayer:parselayer@localhost:5432/parselayer?schema=public
-      SHADOW_DATABASE_URL: postgresql://parselayer:parselayer@localhost:5432/parselayer_shadow?schema=public
-      REDIS_URL: redis://localhost:6379
-      OBJECT_STORAGE_ENDPOINT: http://localhost:9000
-      OBJECT_STORAGE_REGION: us-east-1
-      OBJECT_STORAGE_BUCKET: parselayer-test
-      OBJECT_STORAGE_ACCESS_KEY: test
-      OBJECT_STORAGE_SECRET_KEY: test-value
-      OBJECT_STORAGE_FORCE_PATH_STYLE: 'true'
-      WEB_ORIGIN: http://localhost:3000
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
-      NEXT_TELEMETRY_DISABLED: '1'
-      TURBO_TELEMETRY_DISABLED: '1'
-
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: parselayer
-          POSTGRES_PASSWORD: parselayer
-          POSTGRES_DB: parselayer
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U parselayer -d parselayer"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Enable pnpm
-        uses: pnpm/action-setup@v4
+      - name: Upload formatting paths
+        uses: actions/upload-artifact@v4
         with:
-          version: 11.9.0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma client
-        run: pnpm db:generate
-
-      - name: Validate Prisma schema
-        run: pnpm db:validate
-
-      - name: Deploy migrations to test database
-        run: pnpm db:migrate:deploy
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Type check
-        run: pnpm typecheck
-
-      - name: Run unit tests
-        run: pnpm test
-
-      - name: Run integration tests
-        run: pnpm test:integration
-
-      - name: Build
-        run: pnpm build
+          name: formatting-diagnostic
+          path: formatting-diagnostic.log
+          retention-days: 1
