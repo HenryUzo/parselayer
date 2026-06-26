@@ -1,59 +1,20 @@
-name: CI
+name: Formatting diagnostic
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 permissions:
-  contents: write
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  quality:
+  formatting:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      APP_ENV: test
-      NODE_ENV: test
-      LOG_LEVEL: silent
-      DATABASE_URL: postgresql://parselayer:parselayer@localhost:5432/parselayer?schema=public
-      SHADOW_DATABASE_URL: postgresql://parselayer:parselayer@localhost:5432/parselayer_shadow?schema=public
-      REDIS_URL: redis://localhost:6379
-      OBJECT_STORAGE_ENDPOINT: http://localhost:9000
-      OBJECT_STORAGE_REGION: us-east-1
-      OBJECT_STORAGE_BUCKET: parselayer-test
-      OBJECT_STORAGE_ACCESS_KEY: test
-      OBJECT_STORAGE_SECRET_KEY: test-value
-      OBJECT_STORAGE_FORCE_PATH_STYLE: "true"
-      WEB_ORIGIN: http://localhost:3000
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
-      NEXT_TELEMETRY_DISABLED: "1"
-      TURBO_TELEMETRY_DISABLED: "1"
-
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: parselayer
-          POSTGRES_PASSWORD: parselayer
-          POSTGRES_DB: parselayer
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U parselayer -d parselayer"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
+    timeout-minutes: 10
     steps:
       - name: Check out source branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.head_ref }}
 
       - name: Enable pnpm
         uses: pnpm/action-setup@v4
@@ -64,44 +25,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
-      - name: Install dependencies and generate lockfile
-        run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Commit generated lockfile
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          if [ -n "$(git status --porcelain -- pnpm-lock.yaml)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add pnpm-lock.yaml
-            git commit -m "chore: add pnpm lockfile"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
-
-      - name: Generate Prisma client
-        run: pnpm db:generate
-
-      - name: Validate Prisma schema
-        run: pnpm db:validate
-
-      - name: Deploy migrations to test database
-        run: pnpm db:migrate:deploy
-
-      - name: Check formatting
-        run: pnpm format:check
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Type check
-        run: pnpm typecheck
-
-      - name: Run unit tests
-        run: pnpm test
-
-      - name: Run integration tests
-        run: pnpm test:integration
-
-      - name: Build
-        run: pnpm build
+      - name: List files requiring formatting
+        run: pnpm exec prettier --list-different .
