@@ -23,6 +23,40 @@ export const PERMISSIONS = [
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
+export type RequiredPermission = Permission;
+
+export interface AuthProviderUser {
+  provider: 'clerk';
+  externalUserId: string;
+  email: string | null;
+  sessionId: string | null;
+}
+
+export interface AuthenticatedUserActor {
+  kind: 'user';
+  userId: string;
+  externalAuthUserId: string | null;
+  email: string | null;
+}
+
+export interface AuthenticatedApiKeyActor {
+  kind: 'api_key';
+  apiKeyId: string;
+}
+
+export type AuthenticatedActor = AuthenticatedUserActor | AuthenticatedApiKeyActor;
+
+export interface OrganisationAccessContext {
+  organisationId: string;
+  role: MembershipRole;
+  permissions: readonly Permission[];
+  projectId?: string;
+  environmentId?: string;
+}
+
+export interface ResolvedAuthContext extends OrganisationAccessContext {
+  actor: AuthenticatedActor;
+}
 
 const rolePermissions: Record<MembershipRole, readonly Permission[]> = {
   OWNER: PERMISSIONS,

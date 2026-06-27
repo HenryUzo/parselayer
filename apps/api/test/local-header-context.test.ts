@@ -16,8 +16,12 @@ describe('local header access context', () => {
     );
 
     expect(context).toMatchObject({
-      actorKind: 'user',
-      actorId: 'user_123',
+      actor: {
+        kind: 'user',
+        userId: 'user_123',
+        externalAuthUserId: null,
+        email: null,
+      },
       organisationId: 'org_123',
       role: 'OWNER',
       projectId: 'project_123',

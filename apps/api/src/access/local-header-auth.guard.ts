@@ -20,7 +20,7 @@ export class LocalHeaderAuthGuard implements CanActivate {
       throw new UnauthorizedException('Local header authentication is not available.');
     }
 
-    request.accessContext = accessContext;
+    request.authContext = accessContext;
     return true;
   }
 }

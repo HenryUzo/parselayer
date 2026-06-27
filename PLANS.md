@@ -31,3 +31,9 @@ Never mark an unexecuted check as passed.
 Phase 1 now focuses on access-control foundations: shared role and permission policy, tenant-bound API-key records, API-key hashing and scope primitives, audit-log structure, and local/test-only request context resolution.
 
 This phase still does not implement document ingestion, parsing, OCR, AI extraction, billing, production authentication, or customer-facing onboarding.
+
+## Current increment
+
+- Phase 1 production authentication adapter: `docs/plans/phase-1-production-auth-adapter.md`
+- Scope remains security infrastructure only.
+- Document ingestion, uploads, parsing, OCR, AI extraction, billing, webhooks, SDKs, and review workflows remain out of scope for this PR.
