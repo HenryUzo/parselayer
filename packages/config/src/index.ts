@@ -30,6 +30,14 @@ const apiEnvironmentSchema = baseEnvironmentSchema.extend({
   WEB_ORIGIN: z.url().default('http://localhost:3000'),
 });
 
+const apiAuthEnvironmentSchema = apiEnvironmentSchema.extend({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  CLERK_SECRET_KEY: z.string().min(1).optional(),
+  CLERK_PUBLISHABLE_KEY: z.string().min(1).optional(),
+  CLERK_JWT_KEY: z.string().min(1).optional(),
+  CLERK_API_URL: z.url().optional(),
+});
+
 const workerEnvironmentSchema = baseEnvironmentSchema.merge(dataServicesSchema);
 
 const webEnvironmentSchema = z.object({
@@ -37,6 +45,7 @@ const webEnvironmentSchema = z.object({
 });
 
 export type ApiEnvironment = z.infer<typeof apiEnvironmentSchema>;
+export type ApiAuthEnvironment = z.infer<typeof apiAuthEnvironmentSchema>;
 export type WorkerEnvironment = z.infer<typeof workerEnvironmentSchema>;
 export type WebEnvironment = z.infer<typeof webEnvironmentSchema>;
 export type DataServicesEnvironment = z.infer<typeof dataServicesSchema>;
@@ -68,6 +77,12 @@ function parseEnvironment<T>(schema: z.ZodType<T>, input: NodeJS.ProcessEnv): T 
 
 export function loadApiEnvironment(input: NodeJS.ProcessEnv = process.env): ApiEnvironment {
   return parseEnvironment(apiEnvironmentSchema, input);
+}
+
+export function loadApiAuthEnvironment(
+  input: NodeJS.ProcessEnv = process.env,
+): ApiAuthEnvironment {
+  return parseEnvironment(apiAuthEnvironmentSchema, input);
 }
 
 export function loadWorkerEnvironment(input: NodeJS.ProcessEnv = process.env): WorkerEnvironment {
