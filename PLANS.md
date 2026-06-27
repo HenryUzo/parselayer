@@ -24,9 +24,10 @@ Never mark an unexecuted check as passed.
 
 - Phase 0 — foundation and architecture: completed and merged in pull request #1
 - Phase 1 — foundation scaffold: `docs/plans/phase-1-foundation-scaffold.md`
+- Phase 1 — auth, tenant access, and API keys: `docs/plans/phase-1-auth-tenant-access.md`
 
 ## Active plan
 
-Phase 1 creates the executable engineering foundation: pnpm/Turborepo workspace, strict TypeScript, Next.js web app, NestJS/Fastify API, worker process, PostgreSQL/Prisma, Redis/BullMQ dependencies, local S3-compatible storage, typed configuration, initial tenant schema, CI, and health endpoints.
+Phase 1 now focuses on access-control foundations: shared role and permission policy, tenant-bound API-key records, API-key hashing and scope primitives, audit-log structure, and local/test-only request context resolution.
 
-This phase does not implement document ingestion, parsing, OCR, AI extraction, billing, or production authentication.
+This phase still does not implement document ingestion, parsing, OCR, AI extraction, billing, production authentication, or customer-facing onboarding.

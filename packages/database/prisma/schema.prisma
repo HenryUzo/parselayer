@@ -20,6 +20,12 @@ enum EnvironmentType {
   LIVE
 }
 
+enum ApiKeyStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
 model User {
   id             String   @id @default(cuid())
   externalAuthId String   @unique @map("external_auth_id")
@@ -28,7 +34,9 @@ model User {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  memberships OrganisationMembership[]
+  memberships    OrganisationMembership[]
+  createdApiKeys ApiKey[]                 @relation("ApiKeysCreatedByUser")
+  auditLogs      AuditLog[]               @relation("AuditLogsActorUser")
 
   @@index([email])
   @@map("users")
@@ -41,9 +49,11 @@ model Organisation {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships OrganisationMembership[]
-  projects    Project[]
+  memberships  OrganisationMembership[]
+  projects     Project[]
   environments Environment[]
+  apiKeys      ApiKey[]
+  auditLogs    AuditLog[]
 
   @@map("organisations")
 }
@@ -74,6 +84,7 @@ model Project {
 
   organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   environments Environment[]
+  apiKeys      ApiKey[]
 
   @@unique([organisationId, slug])
   @@index([organisationId])
@@ -90,9 +101,64 @@ model Environment {
 
   organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  apiKeys      ApiKey[]
 
   @@unique([projectId, type])
   @@index([organisationId])
   @@index([organisationId, projectId])
   @@map("environments")
+}
+
+model ApiKey {
+  id              String       @id @default(cuid())
+  organisationId  String       @map("organisation_id")
+  projectId       String       @map("project_id")
+  environmentId   String       @map("environment_id")
+  createdByUserId String?      @map("created_by_user_id")
+  name            String
+  prefix          String       @unique
+  keyHash         String       @unique @map("key_hash")
+  scopes          String[]     @default([])
+  status          ApiKeyStatus @default(ACTIVE)
+  lastUsedAt      DateTime?    @map("last_used_at")
+  expiresAt       DateTime?    @map("expires_at")
+  revokedAt       DateTime?    @map("revoked_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  organisation  Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environment   Environment  @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  createdByUser User?        @relation("ApiKeysCreatedByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  auditLogs     AuditLog[]
+
+  @@index([organisationId])
+  @@index([projectId, environmentId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("api_keys")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organisationId String?  @map("organisation_id")
+  actorUserId    String?  @map("actor_user_id")
+  actorApiKeyId  String?  @map("actor_api_key_id")
+  action         String
+  resourceType   String   @map("resource_type")
+  resourceId     String?  @map("resource_id")
+  metadata       Json?
+  requestId      String?  @map("request_id")
+  traceId        String?  @map("trace_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organisation Organisation? @relation(fields: [organisationId], references: [id], onDelete: SetNull)
+  actorUser    User?         @relation("AuditLogsActorUser", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorApiKey  ApiKey?       @relation(fields: [actorApiKeyId], references: [id], onDelete: SetNull)
+
+  @@index([organisationId, createdAt])
+  @@index([actorUserId])
+  @@index([actorApiKeyId])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
 }
