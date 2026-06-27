@@ -15,10 +15,13 @@
     "test:evaluation": "vitest run --passWithNoTests --dir test/evaluation"
   },
   "dependencies": {
+    "@clerk/backend": "3.8.4",
     "@nestjs/common": "11.1.27",
     "@nestjs/core": "11.1.27",
     "@nestjs/platform-fastify": "11.1.27",
     "@parselayer/config": "workspace:*",
+    "@parselayer/database": "workspace:*",
+    "@parselayer/domain": "workspace:*",
     "fastify": "5.8.5",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
